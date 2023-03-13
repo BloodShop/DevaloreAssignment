@@ -4,7 +4,7 @@ namespace DevaloreAssignment.Controllers
 {
     public class ErrorsController : ControllerBase
     {
-       /* [Route("/error")]
+        /*[Route("/error")]
         public IActionResult Error()
         {
             return Problem();
