@@ -9,5 +9,9 @@ namespace WeatherApiHttp.Clients
         Task<string> GetMostPopularCountry();
         Task<IEnumerable<string>> GetListOfMails();
         Task<UserDto> GetOldestUser();
+
+        Task<bool> CreateNewUser(CreateUserDto createUserDto);
+        Task<CreateUserDto> GetNewUser();
+        Task<bool> UpdateUserData();
     }
 }

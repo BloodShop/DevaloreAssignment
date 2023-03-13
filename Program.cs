@@ -1,11 +1,8 @@
-
-using Microsoft.Extensions.DependencyInjection;
 using WeatherApiHttp.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IUserClient, UserClient>();
 builder.Services.AddEndpointsApiExplorer();
@@ -23,6 +20,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//app.MapPost("/", (CreateUserDto) => "Hello world!")
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -30,5 +29,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 //app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+//app.MapCarter();
 
 app.Run();

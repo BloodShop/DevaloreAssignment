@@ -1,6 +1,0 @@
-﻿
-
-namespace DevaloreAssignment.Endpoints
-{
-  
-}

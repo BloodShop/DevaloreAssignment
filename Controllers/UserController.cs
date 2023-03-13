@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using DevaloreAssignment.Dto;
+using Microsoft.AspNetCore.Mvc;
 using WeatherApiHttp.Clients;
 
 namespace DevaloreAssignment.Controllers
@@ -8,11 +10,13 @@ namespace DevaloreAssignment.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
+        private readonly IMapper _mapper;
         public readonly IUserClient _userService;
 
-        public UserController(ILogger<UserController> logger, IUserClient userClient)
+        public UserController(ILogger<UserController> logger, IMapper mapper, IUserClient userClient)
         {
             _logger = logger;
+            _mapper = mapper;
             _userService = userClient;
         }
 
@@ -20,6 +24,7 @@ namespace DevaloreAssignment.Controllers
         public async Task<IActionResult> GetUsersData(/*[FromQuery]*/ string gender)
         {
             var users = await _userService.GetUsersData(gender);
+            _logger.LogInformation("users retrieved");
             return Ok(users);
         }
 
@@ -33,9 +38,9 @@ namespace DevaloreAssignment.Controllers
         /*[HttpGet("/popular-country")]
         public async Task<IActionResult> GetMostPopularCountry()
         {
-            ErrorOr<string> getMostPoppularCountry = _userService.GetMostPopularCountry();
+            ErrorOr<string> getMostPopularCountry = _userService.GetMostPopularCountry();
 
-            return getMostPoppularCountry.Match(
+            return getMostPopularCountry.Match(
                 country => Ok(MapCountryResponse(country)),
                 errors => Problem(errors));
         }*/
@@ -52,6 +57,36 @@ namespace DevaloreAssignment.Controllers
         {
             var users = await _userService.GetOldestUser();
             return Ok(users);
+        }
+
+        [HttpPost("/post-user")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateNewUser([FromBody] CreateUserDto userDto)
+        {
+            if (userDto == null)
+                return BadRequest(ModelState);
+            
+            var user = _userService.GetNewUser();
+
+            if (user != null)
+            {
+                ModelState.AddModelError("", "user already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //var userMap = _mapper.Map<UserDto>(userDto);
+
+            /*if (!_userService.CreateNewUser(userDto))
+            {
+                ModelState.AddModelError("", "Something went wrong while savin");
+                return StatusCode(500, ModelState);
+            }*/
+
+            return Ok("Successfully created");
         }
 
     }

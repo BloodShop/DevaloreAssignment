@@ -8,10 +8,17 @@ namespace WeatherApiHttp.Clients
     {
         //private const string ApiKey = "";
         private readonly IHttpClientFactory _httpClientFactory;
+        private static ICollection<CreateUserDto> users = new List<CreateUserDto>();
+        private static CreateUserDto? lastUser = null;
 
         public UserClient(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
+        }
+
+        public Task<bool> CreateNewUser(CreateUserDto createUserDto)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable <string>> GetListOfMails()
@@ -51,6 +58,13 @@ namespace WeatherApiHttp.Clients
             return null;
         }
 
+        public async Task<CreateUserDto> GetNewUser()
+        {
+            /*if (users.Contains(lastUser))
+                return users.las;*/
+            return null;
+        }
+
         public async Task<UserDto> GetOldestUser()
         {
             var client = _httpClientFactory.CreateClient("usersapi");
@@ -85,6 +99,11 @@ namespace WeatherApiHttp.Clients
             }
 
             return Enumerable.Empty<UserResponse>();
+        }
+
+        public Task<bool> UpdateUserData()
+        {
+            throw new NotImplementedException();
         }
     }
 }
