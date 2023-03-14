@@ -1,15 +1,19 @@
-﻿using DevaloreAssignment.Models;
-
-namespace DevaloreAssignment.Dto
+﻿namespace DevaloreAssignment.Dto
 {
     public class CreateUserDto
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public string Email { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public string Phone { get; set; }
-        public string Country { get; set; }
 
+
+        public string name { get; set; }
+        public int age { get; set; }
+        public string email { get; set; }
+        public DateTime dateOfBirth { get; set; }
+        public string phone { get; set; }
+        public string country { get; set; }
+
+        public void CreateUser()
+        {
+
+        }
     }
 }

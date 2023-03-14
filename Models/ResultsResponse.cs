@@ -1,12 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace DevaloreAssignment.Models
 {
-
-
     public class ResultResponse
     {
-        public UserResponse[] results { get; set; }
+        [JsonProperty("results")]
+        public User[] users { get; set; }
         public Info info { get; set; }
     }
 
@@ -18,7 +17,7 @@ namespace DevaloreAssignment.Models
         public string version { get; set; }
     }
 
-    public class UserResponse
+    public class User
     {
         public string gender { get; set; }
         public Name name { get; set; }

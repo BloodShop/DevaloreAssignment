@@ -34,7 +34,7 @@ namespace DevaloreAssignment.Middlewares
                 var json = JsonSerializer.Serialize(problem);
 
                 await context.Response.WriteAsync(json);
-
+                 
                 context.Response.ContentType = "application/json";
             }
         }

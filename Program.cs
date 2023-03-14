@@ -1,34 +1,22 @@
-using WeatherApiHttp.Clients;
+using DevaloreAssignment.EndpointsDefinition.SecretLibs;
+using DevaloreAssignment.Models;
+using DevaloreAssignment.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IUserClient, UserClient>();
-builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddHttpClient("usersapi", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]);
-});
+builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddEndpointDefinitions(typeof(ResultResponse));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddHttpClient("usersapi", client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]));
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-//app.MapPost("/", (CreateUserDto) => "Hello world!")
-
+app.UseEndpointDefinitions();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 //app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
-//app.MapCarter();
 
 app.Run();

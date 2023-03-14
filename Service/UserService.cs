@@ -1,22 +1,22 @@
 ﻿using DevaloreAssignment.Dto;
 using DevaloreAssignment.Models;
 using Newtonsoft.Json;
+using System.Reflection;
 
-namespace WeatherApiHttp.Clients
+namespace DevaloreAssignment.Services
 {
-    public class UserClient : IUserClient
+    public class UserService : IUserService
     {
         //private const string ApiKey = "";
         private readonly IHttpClientFactory _httpClientFactory;
-        private static ICollection<CreateUserDto> users = new List<CreateUserDto>();
-        private static CreateUserDto? lastUser = null;
+        private static ICollection<User> _users = new List<User>();
 
-        public UserClient(IHttpClientFactory httpClientFactory)
+        public UserService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        public Task<bool> CreateNewUser(CreateUserDto createUserDto)
+        public Task<bool> CreateNewUser(User createUserDto)
         {
             throw new NotImplementedException();
         }
@@ -32,7 +32,7 @@ namespace WeatherApiHttp.Clients
 
                 var results = JsonConvert.DeserializeObject<ResultResponse>(result);
 
-                return results.results.Select(g => g.email);
+                return results.users.Select(g => g.email);
             }
 
             return null;
@@ -49,7 +49,7 @@ namespace WeatherApiHttp.Clients
 
                 var results = JsonConvert.DeserializeObject<ResultResponse>(result);
 
-                return results.results.GroupBy(x => x.location.country)
+                return results.users.GroupBy(x => x.location.country)
                                .OrderByDescending(g => g.Count())
                                .Select(g => g.Key)
                                .FirstOrDefault();
@@ -60,12 +60,11 @@ namespace WeatherApiHttp.Clients
 
         public async Task<CreateUserDto> GetNewUser()
         {
-            /*if (users.Contains(lastUser))
-                return users.las;*/
+            
             return null;
         }
 
-        public async Task<UserDto> GetOldestUser()
+        public async Task<UserDto?> GetOldestUser()
         {
             var client = _httpClientFactory.CreateClient("usersapi");
             var response = await client.GetAsync($"?results=100");
@@ -76,7 +75,7 @@ namespace WeatherApiHttp.Clients
 
                 var results = JsonConvert.DeserializeObject<ResultResponse>(result);
 
-                var oldest = results.results.OrderByDescending(g => g.dob.age).FirstOrDefault();
+                var oldest = results.users.OrderByDescending(g => g.dob.age).FirstOrDefault();
 
                 return new UserDto() { name = oldest.name, age = oldest.dob.age };
             }
@@ -84,7 +83,7 @@ namespace WeatherApiHttp.Clients
             return null;
         }
 
-        public async Task<IEnumerable<UserResponse>> GetUsersData(string gender, int amount = 10)
+        public async Task<IEnumerable<User>> GetUsersData(string gender, int amount = 10)
         {
             var client = _httpClientFactory.CreateClient("usersapi");
             var response = await client.GetAsync($"?gender={gender}&results={amount}");
@@ -95,15 +94,40 @@ namespace WeatherApiHttp.Clients
 
                 var resultJson = JsonConvert.DeserializeObject<ResultResponse>(result);
 
-                return resultJson.results;
+                return resultJson.users;
             }
 
-            return Enumerable.Empty<UserResponse>();
+            return Enumerable.Empty<User>();
         }
 
-        public Task<bool> UpdateUserData()
+        public async Task<bool> UpdateUserData(User updatedUser)
         {
-            throw new NotImplementedException();
+            var existingUser = await GetUserByEmail(updatedUser.email);
+            if (existingUser != null)
+            {
+                return false;
+            }
+
+            _users.Remove(existingUser);
+            _users.Add(updatedUser);
+            return true;
+        }
+
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            var client = _httpClientFactory.CreateClient("usersapi");
+            var response = await client.GetAsync($"?email={email}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+
+                var resultJson = JsonConvert.DeserializeObject<ResultResponse>(result);
+
+                return resultJson?.users?[0];
+            }
+
+            return null;
         }
     }
 }

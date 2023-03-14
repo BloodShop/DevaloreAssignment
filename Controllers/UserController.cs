@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using DevaloreAssignment.Dto;
 using Microsoft.AspNetCore.Mvc;
-using WeatherApiHttp.Clients;
+using DevaloreAssignment.Services;
+using DevaloreAssignment.Models;
 
 namespace DevaloreAssignment.Controllers
 {
@@ -11,9 +12,9 @@ namespace DevaloreAssignment.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IMapper _mapper;
-        public readonly IUserClient _userService;
+        private readonly IUserService _userService;
 
-        public UserController(ILogger<UserController> logger, IMapper mapper, IUserClient userClient)
+        public UserController(ILogger<UserController> logger, IMapper mapper, IUserService userClient)
         {
             _logger = logger;
             _mapper = mapper;
@@ -62,7 +63,8 @@ namespace DevaloreAssignment.Controllers
         [HttpPost("/post-user")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateNewUser([FromBody] CreateUserDto userDto)
+        
+        public async Task<IActionResult> CreateNewUser([FromBody] CreateUserDto userDto)
         {
             if (userDto == null)
                 return BadRequest(ModelState);
@@ -78,13 +80,13 @@ namespace DevaloreAssignment.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //var userMap = _mapper.Map<UserDto>(userDto);
+            var userMap = _mapper.Map<User>(userDto);
 
-            /*if (!_userService.CreateNewUser(userDto))
+            if (!await _userService.CreateNewUser(userMap))
             {
                 ModelState.AddModelError("", "Something went wrong while savin");
                 return StatusCode(500, ModelState);
-            }*/
+            }
 
             return Ok("Successfully created");
         }
