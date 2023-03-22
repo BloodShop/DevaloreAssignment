@@ -21,8 +21,24 @@ public class HomeController : Controller
     //public IActionResult PostJson([FromBody] IEnumerable<int> values) =>
     //    Ok(new { Consumes = "application/json", Values = values });
 
+    //[HttpPost]
+    //[Consumes("application/x-www-form-urlencoded", "application/json")]
+    //public IActionResult PostForm([FromForm] IEnumerable<int> values, [FromHeader(Name = "content-type")] string contentType) =>
+    //    Ok(new { Consumes = contentType, Values = values });
+
     [HttpPost]
-    [Consumes("application/x-www-form-urlencoded")]
-    public IActionResult PostForm([FromForm] IEnumerable<int> values) =>
-        Ok(new { Consumes = "application/x-www-form-urlencoded", Values = values });
+    //[Consumes("application/x-www-form-urlencoded", "application/json")]
+    public IActionResult PostForm([FromQuery] MyComplexType myComplexType) =>
+        Ok(new { Consumes = myComplexType.ContentType, Values = myComplexType.Values });
+}
+
+public class MyComplexType
+{
+    [FromForm]
+    public IEnumerable<int>? Values { get; set; } 
+
+    [FromHeader(Name = "content-type")]
+    public string ContentType { get; set; }
+
+    public Dictionary<string, int>? Marks { get; set; }
 }

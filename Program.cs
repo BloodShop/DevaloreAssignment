@@ -4,6 +4,7 @@ using DevaloreAssignment.Middlewares;
 using DevaloreAssignment.Models;
 using DevaloreAssignment.RoutingConstraints;
 using DevaloreAssignment.Services;
+using Polly;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -39,7 +40,20 @@ builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddEndpointDefinitions(typeof(ResultResponse));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddHttpClient(userApiOptions.Name, client => client.BaseAddress = new Uri(userApiOptions.BaseAddress));
+
+var timeout = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(5));
+builder.Services
+    .AddHttpClient(userApiOptions.Name, client => client.BaseAddress = new Uri(userApiOptions.BaseAddress))
+    .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2)))
+    .AddTransientHttpErrorPolicy(policy => policy.CircuitBreakerAsync(5, TimeSpan.FromSeconds(5)))
+    .AddPolicyHandler(request =>
+    {
+        return request.Method == HttpMethod.Get
+            ? timeout
+            : Policy.NoOpAsync<HttpResponseMessage>();
+    });
+
+
 //builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"])); // Inject HttpClient at the service
 builder.Services.AddControllers();
 
