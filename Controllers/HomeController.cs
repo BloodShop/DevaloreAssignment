@@ -15,10 +15,11 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    [HttpPost]
-    [Consumes("application/json")]
-    public IActionResult PostJson([FromBody] IEnumerable<int> values) =>
-        Ok(new { Consumes = "application/json", Values = values });
+    //[HttpPost]
+    //[DisableCors]
+    //[Consumes("application/json")]
+    //public IActionResult PostJson([FromBody] IEnumerable<int> values) =>
+    //    Ok(new { Consumes = "application/json", Values = values });
 
     [HttpPost]
     [Consumes("application/x-www-form-urlencoded")]

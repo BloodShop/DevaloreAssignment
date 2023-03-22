@@ -1,35 +1,70 @@
+using DevaloreAssignment.AppSettingsOptions;
 using DevaloreAssignment.EndpointsDefinition.SecretLibs;
+using DevaloreAssignment.Middlewares;
 using DevaloreAssignment.Models;
+using DevaloreAssignment.RoutingConstraints;
 using DevaloreAssignment.Services;
-using Microsoft.Net.Http.Headers;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureAppConfiguration((context, bldr) =>
+{
+    var inmemory = new Dictionary<string, string>
+    {
+        { "UserApiOptions:Name", "apiuser"}
+    };
+    bldr.AddJsonFile("MyConfig.json", optional: false);
+    bldr.AddInMemoryCollection(inmemory); // The last assignment to the "UserApiOptions:Name" will ovveride the others
+});
+
+var corsOptions = builder.Configuration.GetSection("Cors").Get<MyCorsOptions>();
+var userApiOptions = builder.Configuration.GetSection("UserApiOptions").Get<UserApiOptions>();
+
+builder.Services.Configure<UserApiOptions>(builder.Configuration.GetSection("UserApiOptions"));
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("https://cdpn.io")
-                //.AllowAnyHeader()
-                .WithHeaders(/*HeaderNames.ContentType, */"application/x-www-form-urlencoded", "application/json")
-                .AllowAnyMethod()
-                .AllowCredentials();
+            policy
+                .WithOrigins(corsOptions.AllowedOrigins)
+                .AllowAnyHeader()
+                //.WithHeaders(HeaderNames.ContentType, "Content-Type")
+                .AllowAnyMethod();
         });
 });
-
-builder.Services.AddControllers();
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddEndpointDefinitions(typeof(ResultResponse));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddHttpClient("usersapi", client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]));
+builder.Services.AddHttpClient(userApiOptions.Name, client => client.BaseAddress = new Uri(userApiOptions.BaseAddress));
+//builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"])); // Inject HttpClient at the service
+builder.Services.AddControllers();
+
+builder.Services.AddRouting(options => //Custom Constraint check routing match
+{
+    options.ConstraintMap.Add("sex", typeof(GenderConstraint));
+});
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.Use(async (context, next) =>
+    {
+        var apiuser = builder.Configuration["UserApiOptions:Name"];
+        Console.WriteLine("!!!! ", apiuser);
+
+        await next();
+    });
+
+    app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+    app.UseEndpointDefinitions();
+}
+
 app.UseHttpsRedirection();
-app.UseEndpointDefinitions();
 //app.UseStaticFiles();
 //app.UseRouting();
 
@@ -37,7 +72,5 @@ app.UseCors();
 
 app.UseAuthorization();
 app.MapControllers();
-
-//app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.Run();

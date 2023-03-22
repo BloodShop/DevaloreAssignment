@@ -1,6 +1,9 @@
-﻿using DevaloreAssignment.Dto;
+﻿using DevaloreAssignment.AppSettingsOptions;
+using DevaloreAssignment.Dto;
 using DevaloreAssignment.Models;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Net.Http;
 using System.Reflection;
 
 namespace DevaloreAssignment.Services
@@ -9,11 +12,16 @@ namespace DevaloreAssignment.Services
     {
         //private const string ApiKey = "";
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IOptions<UserApiOptions> _options;
+
         private static ICollection<User> _users = new List<User>();
 
-        public UserService(IHttpClientFactory httpClientFactory)
+        public UserService(
+            IHttpClientFactory httpClientFactory,
+            IOptions<UserApiOptions> options)
         {
             _httpClientFactory = httpClientFactory;
+            _options = options;
         }
 
         public Task<bool> CreateNewUser(User createUserDto)
@@ -21,9 +29,9 @@ namespace DevaloreAssignment.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable <string>> GetListOfMails()
+        public async Task<IEnumerable<string>> GetListOfMails()
         {
-            var client = _httpClientFactory.CreateClient("usersapi");
+            var client = _httpClientFactory.CreateClient(_options.Value.Name);
             var response = await client.GetAsync($"?results=30");
 
             if (response.IsSuccessStatusCode)
@@ -40,7 +48,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<string?> GetMostPopularCountry()
         {
-            var client = _httpClientFactory.CreateClient("usersapi");
+            var client = _httpClientFactory.CreateClient(_options.Value.Name);
             var response = await client.GetAsync($"?results=5000");
 
             if (response.IsSuccessStatusCode)
@@ -60,13 +68,12 @@ namespace DevaloreAssignment.Services
 
         public async Task<CreateUserDto> GetNewUser()
         {
-            
             return null;
         }
 
         public async Task<UserDto?> GetOldestUser()
         {
-            var client = _httpClientFactory.CreateClient("usersapi");
+            var client = _httpClientFactory.CreateClient(_options.Value.Name);
             var response = await client.GetAsync($"?results=100");
 
             if (response.IsSuccessStatusCode)
@@ -85,7 +92,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<IEnumerable<User>> GetUsersData(string gender, int amount = 10)
         {
-            var client = _httpClientFactory.CreateClient("usersapi");
+            var client = _httpClientFactory.CreateClient(_options.Value.Name);
             var response = await client.GetAsync($"?gender={gender}&results={amount}");
 
             if (response.IsSuccessStatusCode)
@@ -115,7 +122,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<User?> GetUserByEmail(string email)
         {
-            var client = _httpClientFactory.CreateClient("usersapi");
+            var client = _httpClientFactory.CreateClient(_options.Value.Name);
             var response = await client.GetAsync($"?email={email}");
 
             if (response.IsSuccessStatusCode)

@@ -21,11 +21,11 @@ namespace DevaloreAssignment.Controllers
             _userService = userClient;
         }
 
-        [HttpGet("/users-by-gender/{gender}")]
+        [HttpGet("/users-by-gender/{gender:sex}")]
         public async Task<IActionResult> GetUsersData(/*[FromQuery]*/ string gender)
         {
             var users = await _userService.GetUsersData(gender);
-            _logger.LogInformation("users retrieved");
+            _logger.LogInformation("users retrieved"); // TODO: use serilog 
             return Ok(users);
         }
 
@@ -35,16 +35,6 @@ namespace DevaloreAssignment.Controllers
             var country = await _userService.GetMostPopularCountry();
             return country == null ? NotFound() : Ok(country);
         }
-
-        /*[HttpGet("/popular-country")]
-        public async Task<IActionResult> GetMostPopularCountry()
-        {
-            ErrorOr<string> getMostPopularCountry = _userService.GetMostPopularCountry();
-
-            return getMostPopularCountry.Match(
-                country => Ok(MapCountryResponse(country)),
-                errors => Problem(errors));
-        }*/
 
         [HttpGet("/list-of-mails")]
         public async Task<IActionResult> GetListOfMails()
