@@ -4,6 +4,8 @@ using DevaloreAssignment.Models;
 using DevaloreAssignment.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Web.Http.ModelBinding;
 
 #nullable enable
 namespace DevaloreAssignment.Controllers
@@ -24,7 +26,9 @@ namespace DevaloreAssignment.Controllers
         }
 
         [HttpGet("by-gender/{gender:sex}")]
-        public async Task<IActionResult> GetUsersData([FromRoute] string gender)
+        //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<User>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ModelStateDictionary))]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersData([FromRoute] string gender)
         {
             var users = await _userService.GetUsersData(gender);
 
@@ -35,17 +39,21 @@ namespace DevaloreAssignment.Controllers
                 return NotFound(ModelState);
 
             _logger.LogInformation("users retrieved"); // TODO: use serilog 
-            return Ok(users);
+            return new JsonResult(users, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         }
 
         [HttpGet("popular-country")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetMostPopularCountry()
         {
             var country = await _userService.GetMostPopularCountry();
             return country == null ? NotFound() : Ok(country);
         }
 
-        [HttpGet("list-of-mails")]
+        [HttpGet("list-of-mails/{format?}")]
+        [FormatFilter]
+        [Produces("application/json")]
         public async Task<IActionResult> GetListOfMails()
         {
             var mails = await _userService.GetListOfMails();
@@ -60,8 +68,10 @@ namespace DevaloreAssignment.Controllers
         }
 
         [HttpPost("post-user")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> CreateNewUser([FromBody] CreateUserDto userDto)
         {
             if (userDto == null)
@@ -72,7 +82,7 @@ namespace DevaloreAssignment.Controllers
             if (user != null)
             {
                 ModelState.AddModelError("", "user already exists");
-                return StatusCode(422, ModelState);
+                return UnprocessableEntity(ModelState);
             }
 
             if (!ModelState.IsValid)

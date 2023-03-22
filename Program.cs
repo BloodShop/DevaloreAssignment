@@ -23,6 +23,9 @@ var corsOptions = builder.Configuration.GetSection("Cors").Get<MyCorsOptions>();
 var userApiOptions = builder.Configuration.GetSection("UserApi").Get<UserApiOptions>();
 
 builder.Services.Configure<UserApiOptions>(builder.Configuration.GetSection("UserApi"));
+//builder.Services.AddOptions<UserApiOptions>()
+//    .Bind(builder.Configuration.GetSection(UserApiOptions.UserApi))
+//    .ValidateDataAnnotations();
 
 builder.Services.AddCors(options =>
 {
@@ -52,7 +55,13 @@ builder.Services
             : Policy.NoOpAsync<HttpResponseMessage>());
 
 //builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"])); // Inject HttpClient at the service
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    //.AddNewtonsoftJson()
+    .AddJsonOptions(jsonOptions =>
+    {
+        jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // null
+        //jsonOptions.JsonSerializerOptions.Converters.Add();
+    });
 
 builder.Services.AddRouting(options => //Custom Constraint check routing match
 {

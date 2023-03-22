@@ -12,16 +12,16 @@ namespace DevaloreAssignment.Services
     {
         //private const string ApiKey = "";
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IOptionsSnapshot<UserApiOptions> _options;
+        private readonly UserApiOptions _options;
 
         private static ICollection<User> _users = new List<User>();
 
         public UserService(
             IHttpClientFactory httpClientFactory,
-            IOptionsSnapshot<UserApiOptions> options)
+            IOptionsMonitor<UserApiOptions> options) // IOptionsSnapshot issue - https://github.com/dotnet/runtime/issues/46754
         {
             _httpClientFactory = httpClientFactory;
-            _options = options;
+            _options = options.CurrentValue;
         }
 
         public Task<bool> CreateNewUser(User createUserDto)
@@ -31,7 +31,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<IEnumerable<string>> GetListOfMails()
         {
-            var client = _httpClientFactory.CreateClient(_options.Value.Name);
+            var client = _httpClientFactory.CreateClient(_options.Name);
             var response = await client.GetAsync($"?results=30");
 
             if (response.IsSuccessStatusCode)
@@ -48,7 +48,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<string?> GetMostPopularCountry()
         {
-            var client = _httpClientFactory.CreateClient(_options.Value.Name);
+            var client = _httpClientFactory.CreateClient(_options.Name);
             var response = await client.GetAsync($"?results=5000");
 
             if (response.IsSuccessStatusCode)
@@ -73,7 +73,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<UserDto?> GetOldestUser()
         {
-            var client = _httpClientFactory.CreateClient(_options.Value.Name);
+            var client = _httpClientFactory.CreateClient(_options.Name);
             var response = await client.GetAsync($"?results=100");
 
             if (response.IsSuccessStatusCode)
@@ -92,7 +92,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<IEnumerable<User>> GetUsersData(string gender, int amount = 10)
         {
-            var client = _httpClientFactory.CreateClient(_options.Value.Name);
+            var client = _httpClientFactory.CreateClient(_options.Name);
             var response = await client.GetAsync($"?gender={gender}&results={amount}");
 
             if (response.IsSuccessStatusCode)
@@ -122,7 +122,7 @@ namespace DevaloreAssignment.Services
 
         public async Task<User?> GetUserByEmail(string email)
         {
-            var client = _httpClientFactory.CreateClient(_options.Value.Name);
+            var client = _httpClientFactory.CreateClient(_options.Name);
             var response = await client.GetAsync($"?email={email}");
 
             if (response.IsSuccessStatusCode)
