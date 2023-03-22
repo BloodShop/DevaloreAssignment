@@ -12,13 +12,13 @@ namespace DevaloreAssignment.Services
     {
         //private const string ApiKey = "";
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IOptions<UserApiOptions> _options;
+        private readonly IOptionsSnapshot<UserApiOptions> _options;
 
         private static ICollection<User> _users = new List<User>();
 
         public UserService(
             IHttpClientFactory httpClientFactory,
-            IOptions<UserApiOptions> options)
+            IOptionsSnapshot<UserApiOptions> options)
         {
             _httpClientFactory = httpClientFactory;
             _options = options;

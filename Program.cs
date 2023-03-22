@@ -20,9 +20,9 @@ builder.Host.ConfigureAppConfiguration((context, bldr) =>
 });
 
 var corsOptions = builder.Configuration.GetSection("Cors").Get<MyCorsOptions>();
-var userApiOptions = builder.Configuration.GetSection("UserApiOptions").Get<UserApiOptions>();
+var userApiOptions = builder.Configuration.GetSection("UserApi").Get<UserApiOptions>();
 
-builder.Services.Configure<UserApiOptions>(builder.Configuration.GetSection("UserApiOptions"));
+builder.Services.Configure<UserApiOptions>(builder.Configuration.GetSection("UserApi"));
 
 builder.Services.AddCors(options =>
 {
