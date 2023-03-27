@@ -55,13 +55,14 @@ builder.Services
             : Policy.NoOpAsync<HttpResponseMessage>());
 
 //builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"])); // Inject HttpClient at the service
-builder.Services.AddControllers()
+builder.Services.AddControllers();
+    //.AddXmlSerializerFormatters()
     //.AddNewtonsoftJson()
-    .AddJsonOptions(jsonOptions =>
-    {
-        jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // null
-        //jsonOptions.JsonSerializerOptions.Converters.Add();
-    });
+    //.AddJsonOptions(jsonOptions =>
+    //{
+    //    jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // null
+    //    //jsonOptions.JsonSerializerOptions.Converters.Add();
+    //});
 
 builder.Services.AddRouting(options => //Custom Constraint check routing match
 {
