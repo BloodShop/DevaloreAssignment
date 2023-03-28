@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DevaloreAssignment.Authentication;
 using DevaloreAssignment.Dto;
 using DevaloreAssignment.Models;
 using DevaloreAssignment.Services;
@@ -26,6 +27,8 @@ namespace DevaloreAssignment.Controllers
         }
 
         [HttpGet("by-gender/{gender:sex}")]
+        [ServiceFilter(typeof(ApiKeyAuthFilter))] // better approach
+        /*[ApiKeyAuth]*/
         //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<User>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ModelStateDictionary))]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersData([FromRoute] string gender)
@@ -43,6 +46,7 @@ namespace DevaloreAssignment.Controllers
         }
 
         [HttpGet("popular-country")]
+        [ServiceFilter(typeof(ApiKeyAuthFilter))] // better approach
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetMostPopularCountry()

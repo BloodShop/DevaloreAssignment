@@ -1,4 +1,5 @@
 using DevaloreAssignment.AppSettingsOptions;
+using DevaloreAssignment.Authentication;
 using DevaloreAssignment.EndpointsDefinition.SecretLibs;
 using DevaloreAssignment.Middlewares;
 using DevaloreAssignment.Models;
@@ -55,14 +56,16 @@ builder.Services
             : Policy.NoOpAsync<HttpResponseMessage>());
 
 //builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new Uri(builder.Configuration["BaseAddress"])); // Inject HttpClient at the service
-builder.Services.AddControllers();
-    //.AddXmlSerializerFormatters()
-    //.AddNewtonsoftJson()
-    //.AddJsonOptions(jsonOptions =>
-    //{
-    //    jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // null
-    //    //jsonOptions.JsonSerializerOptions.Converters.Add();
-    //});
+builder.Services.AddControllers(/*x => x.Filters.Add<ApiKeyAuthFilter>()*/);
+//.AddXmlSerializerFormatters()
+//.AddNewtonsoftJson()
+//.AddJsonOptions(jsonOptions =>
+//{
+//    jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // null
+//    //jsonOptions.JsonSerializerOptions.Converters.Add();
+//});
+
+builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 builder.Services.AddRouting(options => //Custom Constraint check routing match
 {
@@ -76,7 +79,7 @@ if (app.Environment.IsDevelopment())
     app.Use(async (context, next) =>
     {
         var apiuser = builder.Configuration["UserApiOptions:Name"];
-        Console.WriteLine("!!!! ", apiuser);
+        //Console.WriteLine("!!!! ", apiuser);
 
         await next();
     });
@@ -90,6 +93,8 @@ app.UseHttpsRedirection();
 //app.UseRouting();
 
 app.UseCors();
+
+//app.UseMiddleware<ApiKeyAuthMiddleware>();
 
 app.UseAuthorization();
 app.MapControllers();
