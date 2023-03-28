@@ -17,6 +17,28 @@ namespace DevaloreAssignment.EndpointsDefinition
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DevaloreApi", Version = "v1" });
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Description = "The Api key to access api",
+                    Type = SecuritySchemeType.ApiKey,
+                    Name = "x-api-key",
+                    In = ParameterLocation.Header,
+                    Scheme = "ApiKeyScheme"
+                });
+                var scheme = new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "ApiKey"
+                    },
+                    In = ParameterLocation.Header,
+                };
+                var requirement = new OpenApiSecurityRequirement
+                {
+                    { scheme, new List<string>() }
+                };
+                c.AddSecurityRequirement(requirement);
             });
         }
     }

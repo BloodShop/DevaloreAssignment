@@ -3,8 +3,6 @@ using DevaloreAssignment.Dto;
 using DevaloreAssignment.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Net.Http;
-using System.Reflection;
 
 namespace DevaloreAssignment.Services
 {
