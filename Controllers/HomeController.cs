@@ -35,10 +35,10 @@ public class HomeController : Controller
 public class MyComplexType
 {
     [FromForm]
-    public IEnumerable<int>? Values { get; set; } 
+    public IEnumerable<int>? Values { get; set; }
 
     [FromHeader(Name = "content-type")]
-    public string ContentType { get; set; }
+    public string ContentType { get; set; } = null!;
 
     public Dictionary<string, int>? Marks { get; set; }
 }
