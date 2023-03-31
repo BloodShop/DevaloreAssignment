@@ -42,7 +42,6 @@ builder.Services.AddAuthentication("default")
 
         //o.ExpireTimeSpan = TimeSpan.FromSeconds(10);
         //o.SlidingExpiration = true;
-
     });
 builder.Services.AddAuthorization(b =>
 {
