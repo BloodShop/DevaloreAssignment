@@ -13,6 +13,5 @@ namespace DevaloreAssignment.Helper
             CreateMap<CreateUserDto, User>();
             CreateMap<User, CreateUserDto>();
         }
-
     }
 }
