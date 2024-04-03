@@ -10,14 +10,7 @@ public class AuthController : Controller
     public async Task<IActionResult> Login()
     {
         await HttpContext.SignInAsync("default", new ClaimsPrincipal(
-            new ClaimsIdentity(
-                new Claim[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                },
-                "default"
-                )
-            ),
+            new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) }, "default")),
             new AuthenticationProperties
             {
                 IsPersistent = true,
