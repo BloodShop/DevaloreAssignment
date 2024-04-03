@@ -15,8 +15,7 @@ namespace DevaloreAssignment.Controllers
                     {
                         new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                     },
-                    "default"
-                    )),
+                    "default")),
                 new AuthenticationProperties
                 {
                     IsPersistent = true,
