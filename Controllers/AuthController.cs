@@ -2,19 +2,27 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace DevaloreAssignment.Controllers;
-
-public class AuthController : Controller
+namespace DevaloreAssignment.Controllers
 {
-    [HttpPost("/mvc/login")]
-    public async Task<IActionResult> Login()
+    public class AuthController : Controller
     {
-        await HttpContext.SignInAsync("default", new ClaimsPrincipal(
-            new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) }, "default")),
-            new AuthenticationProperties
-            {
-                IsPersistent = true,
-            });
-        return Ok();
+        [HttpPost("/mvc/login")]
+        public async Task<IActionResult> Login()
+        {
+            await HttpContext.SignInAsync("default", new ClaimsPrincipal(
+                new ClaimsIdentity(
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                    },
+                    "default"
+                    )
+                ),
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                });
+            return Ok();
+        }
     }
 }
